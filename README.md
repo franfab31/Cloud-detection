@@ -1,14 +1,24 @@
 # Cloud Detection on 38-Cloud with U-Net
 
-Pixel-wise cloud segmentation of Landsat 8 satellite imagery using a U-Net implemented from scratch in PyTorch.
-This was my Bachelor's thesis project in Computer and Automation Engineering at Sapienza University of Rome (A.Y. 2023/2024, supervisor Prof. Thomas Alessandro Ciarfuglia).
+![Python](https://img.shields.io/badge/Python-3-3776AB?logo=python&logoColor=white)
+![PyTorch](https://img.shields.io/badge/PyTorch-U--Net%20from%20scratch-EE4C2C?logo=pytorch&logoColor=white)
+![Task](https://img.shields.io/badge/Task-semantic%20segmentation-2ea44f)
+![Google Colab](https://img.shields.io/badge/Google%20Colab-notebook-F9AB00?logo=googlecolab&logoColor=white)
 
+Pixel-wise cloud segmentation of Landsat 8 satellite imagery with a U-Net implemented from scratch in PyTorch.
 The full write-up (in Italian) is in [`relazione.pdf`](relazione.pdf).
+
+> **Bachelor's thesis** — Computer and Automation Engineering, Sapienza University of Rome · A.Y. 2023/2024  
+> **Author:** Francesco Fabrizi · **Supervisor:** Prof. Thomas Alessandro Ciarfuglia
+
+---
 
 ## Overview
 
 Clouds hide the ground in a large share of Landsat scenes, so detecting them is a standard preprocessing step in remote sensing.
 The model receives a 4-channel patch (Red, Green, Blue and Near-Infrared) and predicts a binary cloud / no-cloud mask for every pixel.
+
+---
 
 ## Dataset
 
@@ -20,6 +30,8 @@ The dataset has two problems that shaped most of the work:
 - **Class imbalance.** About a third of the training patches are entirely black (no data), and non-cloud pixels outnumber cloud pixels by a wide margin.
 - **Noisy ground truth.** The masks were labelled manually and are sometimes imprecise.
 
+---
+
 ## Method
 
 - **Model:** U-Net with a 64-128-256-512 encoder, a mirrored decoder with transposed convolutions and skip connections, and 2 output classes.
@@ -29,6 +41,8 @@ The dataset has two problems that shaped most of the work:
 - **Model selection:** the checkpoint with the best validation F1-score is saved. F1 is used instead of accuracy, because accuracy stays around 96–98% even for a model that misses most clouds.
 - **Data cleaning:** the 2,813 all-black patches were removed, leaving 5,587 patches (4,469 train / 1,118 validation). This cut training time and reduced the overestimation of cloud areas.
 
+---
+
 ## Results
 
 - Training for 10 epochs gave the best balance. At 30 epochs the F1-score rose to about 97%, but the predicted masks visibly overestimated the clouds, which points to overfitting around epoch 20.
@@ -36,19 +50,21 @@ The dataset has two problems that shaped most of the work:
 
 Validation predictions. From left to right: input patch, ground truth, model trained on the **cleaned** dataset, model trained on the **original** dataset. Yellow is cloud.
 
-![Model comparison](assets/model_comparison.png)
+<p align="center"><img src="assets/model_comparison.png" width="700" alt="Model comparison"></p>
 
 Training curves of the 10-epoch model (loss weight 0.43). Validation accuracy stays around 96–97% from the second epoch, which is why F1 was used for model selection instead.
 
-![Training curves](assets/training_curves.png)
+<p align="center"><img src="assets/training_curves.png" width="720" alt="Training curves"></p>
 
 ### Failure case: snow and water
 
 The main weakness is that snow, ice and water bodies are often classified as clouds. In the examples below (input, ground truth, prediction) the ground truth has almost no clouds, but the model marks the snowy ridges and the lake.
 
-![Snow misclassified as cloud](assets/snow_failure.png)
+<p align="center"><img src="assets/snow_failure.png" width="640" alt="Snow misclassified as cloud"></p>
 
 With only RGB and NIR bands, snow and clouds have similar reflectance. Thermal or SWIR bands and more snowy training samples (e.g. the [95-Cloud](https://github.com/SorourMo/95-Cloud-An-Extension-to-38-Cloud-Dataset) extension) would likely help.
+
+---
 
 ## Repository contents
 
@@ -56,6 +72,8 @@ With only RGB and NIR bands, snow and clouds have similar reflectance. Thermal o
 |------|-------------|
 | `38_cloud.py` | Full pipeline exported from Colab: data loading, dataset class, U-Net, training, validation and visualisation |
 | `relazione.pdf` | Thesis report (Italian) |
+
+---
 
 ## Running it
 
@@ -66,7 +84,3 @@ The easiest way to run it is the notebook:
 
 The dataset is downloaded through the Kaggle API, so you need a `kaggle.json` token in the Colab working directory.
 Trained models and CSV logs are saved to Google Drive (`/content/drive/MyDrive/Tesi/`), so you will need to change that path to your own folder.
-
-## Tech stack
-
-Python · PyTorch · torchvision · Albumentations · scikit-learn · OpenCV · pandas · Matplotlib / Seaborn

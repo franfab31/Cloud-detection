@@ -33,7 +33,22 @@ The dataset has two problems that shaped most of the work:
 
 - Training for 10 epochs gave the best balance. At 30 epochs the F1-score rose to about 97%, but the predicted masks visibly overestimated the clouds, which points to overfitting around epoch 20.
 - The model trained on the cleaned dataset was the best overall: it delineates cloud shapes well on dark or high-contrast backgrounds, correctly handles cloud-free patches, and catches thin clouds.
-- **Main weakness:** snow, ice and water bodies are often classified as clouds. With only RGB and NIR bands the classes have similar reflectance. Thermal or SWIR bands and more snowy training samples (e.g. the [95-Cloud](https://github.com/SorourMo/95-Cloud-An-Extension-to-38-Cloud-Dataset) extension) would likely help.
+
+Validation predictions. From left to right: input patch, ground truth, model trained on the **cleaned** dataset, model trained on the **original** dataset. Yellow is cloud.
+
+![Model comparison](assets/model_comparison.png)
+
+Training curves of the 10-epoch model (loss weight 0.43). Validation accuracy stays around 96–97% from the second epoch, which is why F1 was used for model selection instead.
+
+![Training curves](assets/training_curves.png)
+
+### Failure case: snow and water
+
+The main weakness is that snow, ice and water bodies are often classified as clouds. In the examples below (input, ground truth, prediction) the ground truth has almost no clouds, but the model marks the snowy ridges and the lake.
+
+![Snow misclassified as cloud](assets/snow_failure.png)
+
+With only RGB and NIR bands, snow and clouds have similar reflectance. Thermal or SWIR bands and more snowy training samples (e.g. the [95-Cloud](https://github.com/SorourMo/95-Cloud-An-Extension-to-38-Cloud-Dataset) extension) would likely help.
 
 ## Repository contents
 
